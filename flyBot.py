@@ -732,11 +732,11 @@ class flyBot(BotAI):
                 prpr = pr.closer_than(2,ngng)
                 if len(prpr) == 1:
                     prpr = prpr.closest_to(ngng)
-                    #if checkOrder(prpr, AbilityId.WORKERSTOPIDLEABILITYVESPENE_GATHER):
-                        #idle.append(prpr)
+                    if checkOrder(prpr, AbilityId.WORKERSTOPIDLEABILITYVESPENE_GATHER):
+                        idle.append(prpr)
                         #if self.mineral_field.exists:
-                            #prpr.gather(self.mineral_field.closest_to(prpr))
-                    idle.append(prpr)
+                        #    prpr.gather(self.mineral_field.closest_to(prpr))
+                    #idle.append(prpr)
             for prpr in pr.idle:
                 if prpr.is_carrying_resource:
                     prpr.return_resource()

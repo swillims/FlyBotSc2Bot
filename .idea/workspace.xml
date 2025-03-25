@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dac55a57-9fd2-4b22-927b-a77681188d99" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flyBot.py" beforeDir="false" afterPath="$PROJECT_DIR$/flyBot.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
