@@ -144,7 +144,7 @@ class flyBot(BotAI):
         self.quarryUnits = self.units.not_structure
         self.quarryStructures = self.structures.exclude_type(uId.ORACLESTASISTRAP)
         self.quarrySelf = self.quarryUnits | self.quarryStructures
-        self.workerNotBuilding = self.quarryUnits(uId.PROBE).idle | self.quarryUnits(uId.PROBE).filter(lambda pr: checkMultiOrder(pr,[AbilityId.HARVEST_GATHER,AbilityId.HARVEST_RETURN,AbilityId.MOVE,AbilityId.ATTACK]))
+        self.workerNotBuilding = self.quarryUnits(uId.PROBE).idle | self.quarryUnits(uId.PROBE).filter(lambda pr: checkMultiOrder(pr,[AbilityId.HARVEST_GATHER,AbilityId.HARVEST_RETURN,AbilityId.MOVE]))
         self.workerBuilder = self.workerNotBuilding
         wb = self.workerBuilder.filter(lambda wbwb: not wbwb.is_carrying_resource)
         if wb.exists:
@@ -731,11 +731,12 @@ class flyBot(BotAI):
             for ngng in ng:
                 prpr = pr.closer_than(2,ngng)
                 if len(prpr) == 1:
-                    prpr = prpr.first
-                    if checkOrder(prpr, AbilityId.WORKERSTOPIDLEABILITYVESPENE_GATHER):
-                        idle.append(prpr)
+                    prpr = prpr.closest_to(ngng)
+                    #if checkOrder(prpr, AbilityId.WORKERSTOPIDLEABILITYVESPENE_GATHER):
+                        #idle.append(prpr)
                         #if self.mineral_field.exists:
                             #prpr.gather(self.mineral_field.closest_to(prpr))
+                    idle.append(prpr)
             for prpr in pr.idle:
                 if prpr.is_carrying_resource:
                     prpr.return_resource()
