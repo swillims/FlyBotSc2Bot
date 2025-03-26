@@ -144,8 +144,7 @@ class flyBot(BotAI):
         self.quarryUnits = self.units.not_structure
         self.quarryStructures = self.structures.exclude_type(uId.ORACLESTASISTRAP)
         self.quarrySelf = self.quarryUnits | self.quarryStructures
-        self.workerNotBuilding = self.quarryUnits(uId.PROBE).idle | self.quarryUnits(uId.PROBE).filter(lambda pr: checkMultiOrder(pr,[AbilityId.HARVEST_GATHER,AbilityId.HARVEST_RETURN,AbilityId.MOVE]))
-        self.workerBuilder = self.workerNotBuilding
+        self.workerBuilder = self.quarryUnits(uId.PROBE).idle | self.quarryUnits(uId.PROBE).filter(lambda pr: checkMultiOrder(pr,[AbilityId.HARVEST_GATHER,AbilityId.HARVEST_RETURN,AbilityId.MOVE,AbilityId.ATTACK]))
         wb = self.workerBuilder.filter(lambda wbwb: not wbwb.is_carrying_resource)
         if wb.exists:
             self.workerBuilder = wb
@@ -161,7 +160,7 @@ class flyBot(BotAI):
 
     # base macro
     async def buildOrder(self):
-        pr = self.workerNotBuilding
+        pr = self.workerBuilder
         n = self.quarryStructures(uId.NEXUS)
         pl = self.quarryStructures(uId.PYLON)
         g = self.quarryStructures(uId.GATEWAY)
@@ -266,7 +265,6 @@ class flyBot(BotAI):
 
     async def manageSupply(self, supplyBuffer=8, structureHops=8, obstacleHops=8, preHop=1):
         n = self.quarryStructures(uId.NEXUS)
-        #pr = self.workerNotBuilding
         if n.exists and self.workerBuilder.exists:
             if(not self.quarryStructures(uId.PYLON).exists)or(self.supply_left<supplyBuffer and self.supply_cap<200):
                 if not self.already_pending(uId.PYLON):
@@ -309,10 +307,10 @@ class flyBot(BotAI):
                         if self.can_afford(uId.NEXUS):
                             #await self.expand_now()
                             p = await self.findExpandLocation()
-                            if self.workerNotBuilding.exists and not p is None:
-                                b = self.workerNotBuilding.closest_to(p)
+                            if self.workerBuilder.exists and not p is None:
+                                b = self.workerBuilder.closest_to(p)
                                 if await self.client.query_pathing(b,p) is None:
-                                    b = self.workerNotBuilding.furthest_to(b)
+                                    b = self.workerBuilder.furthest_to(b)
                                 b.build(uId.NEXUS, p)
                             if not self.hasBeenAttacked:
                                 self.rallyPointDefend = self.quarryStructures.closest_to(self.pathingLocationCheck).position.towards(self.pathingLocationCheck,4)
@@ -457,7 +455,7 @@ class flyBot(BotAI):
     async def cCoreLogic(self):
         c = self.quarryStructures(uId.CYBERNETICSCORE)
         if not c.exists and not self.already_pending(uId.CYBERNETICSCORE):
-            pr = self.workerNotBuilding
+            pr = self.workerBuilder
             pl = self.quarryStructures(uId.PYLON)
             if pr.exists and pl.exists:
                 p = await self.findBuildingLocationFixer()
@@ -655,7 +653,7 @@ class flyBot(BotAI):
             ac = a.center
             a = a.filter(lambda aa: aa.distance_to(ac) > 10)
         #pr = self.quarryUnits(uId.PROBE)
-        pr = self.workerNotBuilding.idle
+        pr = self.workerBuilder.idle
         n = self.quarryStructures(uId.NEXUS).ready.filter(lambda nn: nn.energy > 50)
         m = self.quarryUnits(uId.MOTHERSHIP)#.filter(lambda mm: mm.energy > 50)
         if a.exists:
@@ -850,7 +848,8 @@ class flyBot(BotAI):
                 elif prpr.distance_to(self.quarryStructures.closest_to(prpr))<checkDistance:
                     eg = e.not_flying.closer_than(checkDistance,prpr)
                     if prpr.weapon_cooldown < .1:
-                        if eg.exists and eg.amount > countHasAbility(pr, AbilityId.ATTACK):
+                        #if eg.exists and eg.amount > countHasAbility(pr, AbilityId.ATTACK):
+                        if eg.amount > countHasAbility(pr, AbilityId.ATTACK) + (countHasAbility(pr, AbilityId.MOVE)/2):
                             prpr.attack(eg.closest_to(prpr))
                     elif self.mineral_field.exists:
                         if eg.exists:
